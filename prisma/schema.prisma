@@ -1,0 +1,30 @@
+generator client {
+  provider = "prisma-client-js"
+  engineType = "library"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Tenant {
+  id        String   @id @default(cuid())
+  name      String
+  createdAt DateTime @default(now())
+  servers   Server[] // One-to-many relation
+}
+
+model Server {
+  id        String   @id @default(cuid())
+  name      String
+  status    String   @default("offline") // "online", "offline", "maintenance"
+  tenantId  String
+  tenant    Tenant   @relation(fields: [tenantId], references: [id])
+  createdAt DateTime @default(now())
+
+  // SSH details
+  ipAddress String?
+  username  String?
+  password  String? // Storing plain text for demo scaffold purposes ONLY
+}
